@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字广绣文化展示系统</title>
+    <style>
+        :root {
+            --amber: #FFD700;
+            --ochre: #8B4513;
+            --beige: #F4E7D3;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(150deg, #f4e7d3 0%, #d8c3a5 100%);
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            height: 200px;
+            background: url('your-bg-image.jpg') center/cover;
+            position: relative;
+            border-radius: 12px;
+            margin-bottom: 60px;
+        }
+
+        .design-notes {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 3D立方体 */
+        .cube-container {
+            perspective: 1000px;
+            margin: 100px auto;
+            width: 200px;
+            height: 200px;
+        }
+
+        .cube {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #cdaa7d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--ochre);
+            box-shadow: 0 0 15px rgba(205, 170, 125, 0.3);
+        }
+
+        .front { transform: translateZ(100px); }
+        .back { transform: translateZ(-100px) rotateY(180deg); }
+        .right { transform: rotateY(90deg) translateZ(100px); }
+        .left { transform: rotateY(-90deg) translateZ(100px); }
+        .top { transform: rotateX(90deg) translateZ(100px); }
+        .bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+        /* 按钮区域 */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .function-btn {
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .function-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .cube-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .cube-face {
+                font-size: 18px;
+            }
+
+            .header {
+                height: 150px;
+            }
+        }
+
+        @media (hover: none) {
+            .cube {
+                animation: auto-rotate 20s linear infinite;
+            }
+        }
+
+        @keyframes auto-rotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="design-notes">
+            <h2>设计说明</h2>
+            <p>数字广绣文化传承展示系统</p>
+        </div>
+    </div>
+
+    <div class="cube-container">
+        <div class="cube" id="mainCube">
+            <div class="cube-face front">数字广绣</div>
+            <div class="cube-face back">绣</div>
+            <div class="cube-face right">过程图</div>
+            <div class="cube-face left">光电</div>
+            <div class="cube-face top">十大名牌</div>
+            <div class="cube-face bottom">数字识别</div>
+        </div>
+    </div>
+
+    <div class="button-grid" id="buttonContainer"></div>
+</div>
+
+<script>
+    // 配置数据
+    const buttons = [
+        { label: '广绣产品', color: '#FFD700', action: 'showProducts' },
+        { label: '广绣针法', color: '#FFA500', action: 'showTechniques' },
+        { label: '悠悠历史', color: '#FFD700', action: 'showHistory' },
+        { label: '十大名牌', color: '#FFA500', action: 'showBrands' },
+        { label: '数字识别', color: '#FFD700', action: 'startRecognition' }
+    ];
+
+    // 初始化按钮
+    function initButtons() {
+        const container = document.getElementById('buttonContainer');
+        buttons.forEach(btn => {
+            const button = document.createElement('div');
+            button.className = 'function-btn';
+            button.textContent = btn.label;
+            button.style.backgroundColor = btn.color;
+            button.addEventListener('click', () => handleButtonClick(btn.action));
+            container.appendChild(button);
+        });
+    }
+
+    // 立方体交互逻辑
+    let rotateInterval;
+    const cube = document.getElementById('mainCube');
+    let currentRotation = 0;
+
+    cube.addEventListener('mouseenter', () => {
+        rotateInterval = setInterval(() => {
+            currentRotation += 2;
+            cube.style.transform = `rotateY(${currentRotation}deg)`;
+        }, 50);
+    });
+
+    cube.addEventListener('mouseleave', () => {
+        clearInterval(rotateInterval);
+    });
+
+    // 按钮点击处理
+    function handleButtonClick(action) {
+        console.log('执行操作:', action);
+        // 示例：切换立方体视角
+        switch(action) {
+            case 'showProducts':
+                cube.style.transform = 'rotateY(0deg)';
+                break;
+            case 'showTechniques':
+                cube.style.transform = 'rotateY(90deg)';
+                break;
+            case 'showHistory':
+                cube.style.transform = 'rotateY(180deg)';
+                break;
+            case 'showBrands':
+                cube.style.transform = 'rotateX(90deg)';
+                break;
+            case 'startRecognition':
+                cube.style.transform = 'rotateX(-90deg)';
+                break;
+        }
+    }
+
+    // 触摸设备适配
+    function handleTouch() {
+        let startX, startY;
+
+        cube.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+
+        cube.addEventListener('touchmove', e => {
+            const deltaX = e.touches[0].clientX - startX;
+            const deltaY = e.touches[0].clientY - startY;
+            cube.style.transform = `rotateY(${deltaX}deg) rotateX(${deltaY}deg)`;
+        });
+    }
+
+    // 初始化
+    window.addEventListener('DOMContentLoaded', () => {
+        initButtons();
+        if ('ontouchstart' in window) handleTouch();
+    });
+</script>
+</body>
+</html>
